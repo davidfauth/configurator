@@ -1,0 +1,31 @@
+load csv with headers from "file:/Users/davidfauth/neo4j_lenovo/export/C_OD.csv" as line
+with line 
+MERGE (m:Material {material:line.MATERIAL});
+
+load csv with headers from "file:/Users/davidfauth/neo4j_lenovo/export/C_VARIANT_TABLE.csv" as line
+with line 
+MERGE (v:CharCharValue {id:line.CHAR + '_' + line.CHARVALUE})
+ON CREATE SET v.char = line.CHAR, 
+v.charValue = line.CHARVALUE
+ON MATCH SET v.char = line.CHAR, 
+v.charValue = line.CHARVALUE;
+
+load csv with headers from "file:/Users/davidfauth/neo4j_lenovo/export/C_CTO_BOM.csv" as line
+with line 
+MATCH  (m:Material {material:line.MATERIAL})
+MATCH (v:CharCharValue {id:line.CHAR + '_' + line.CHARVALUE})
+MERGE (m)-[:HAS_BOM]-(v);
+
+load csv with headers from "file:/Users/davidfauth/neo4j_lenovo/export/C_VARIANT_TABLE.csv" as line
+with line 
+MERGE (v:VarTabSeq {id:line.VARTAB + '_' + line.SEQUENCE})
+ON CREATE SET v.varTab = line.VARTAB, 
+v.sequence = line.SEQUENCE
+ON MATCH SET v.varTab = line.VARTAB, 
+v.sequence = line.SEQUENCE;
+
+load csv with headers from "file:/Users/davidfauth/neo4j_lenovo/export/C_VARIANT_TABLE.csv" as line
+with line 
+MATCH (ccv:CharCharValue {id:line.CHAR + '_' + line.CHARVALUE})
+MATCH (v:VarTabSeq {id:line.VARTAB + '_' + line.SEQUENCE})
+MERGE (ccv)-[:VARTABSEQUENCE]->(v);
